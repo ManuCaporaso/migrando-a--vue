@@ -1,25 +1,41 @@
-<template>
-  <div>
-    <h1>Bienvenido, {{ userStore.user.user }}</h1>
-    <p>Contraseña: {{ userStore.user.password }}</p>
-    <p>Recordarme: {{ userStore.user.remember ? 'Sí' : 'No' }}</p>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { useUserStore } from '../store/userStore'
+import { useUserStore } from '@/store/userStore'
+import { useRouter } from 'vue-router'
 
 const userStore = useUserStore()
+const router = useRouter()
+const user = userStore.user
+const logout = () => {
+  router.push({ name: 'LoginPage' })
+}
 </script>
+
+<template>
+  <div>
+    <h1>Bienvenido, {{ user.login }}!</h1>
+    <h1>Su Password es: {{ user.password }}</h1>
+    <h1>Recordarme: {{ user.rememberMe }}</h1>
+  </div>
+  <button @click="logout()">Cerrar Sesión</button>
+</template>
 
 <style scoped>
 h1 {
-  font-size: 2.5em;
-  color: #ffffff;
+  color: #fff;
+  margin: 20px;
+  font-size: 3rem;
 }
 
-p {
+button {
+  width: 100%;
+  height: 50px;
+  border-radius: 15px;
+  border: none;
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
   font-size: 1.2em;
-  color: #ffffff;
+  font-weight: 600;
+  color: #333;
 }
 </style>

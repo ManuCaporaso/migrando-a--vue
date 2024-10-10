@@ -1,7 +1,11 @@
-<template>
-  <div id="app">
-    <router-view />
-  </div>
-</template>
+<script setup lang="ts">
+import { RouterLink } from 'vue-router'
+</script>
 
-<script setup lang="ts"></script>
+<template>
+  <header>
+    <RouterLink to="/" />
+  </header>
+
+  <RouterView />
+</template>

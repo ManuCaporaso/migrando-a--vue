@@ -1,14 +1,13 @@
 import { defineStore } from 'pinia'
 
-interface User {
-  user: string
-  password: string
-  remember: boolean
-}
+import type { User } from '@/models/UserModel.ts'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    user: {} as User
+    user: {
+      login: '',
+      password: ''
+    } as User
   }),
   actions: {
     setUser(user: User) {
