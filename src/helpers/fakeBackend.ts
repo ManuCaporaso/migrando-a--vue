@@ -17,6 +17,7 @@ const user: User = {
   password: 'test',
   isAdmin: true,
   refreshTokens: []
+  
 }
 
 // si no hay usuarios creamos uno y lo guardamos en almacenamiento local

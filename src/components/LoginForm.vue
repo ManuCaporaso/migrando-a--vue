@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
 import type { User } from '@/models/UserModel';
 
 // importaciones locales
 import { useUserStore } from '@/store/userStore';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/store/authStore';
 
 //importaciones de librerias
 import {Form,Field} from 'vee-validate'
@@ -12,7 +12,9 @@ import * as Yup from 'yup'
 
 
 const uStore = useUserStore()
+console.log(uStore)
 const router = useRouter()
+const auth = useAuthStore()
 
 const schema = Yup.object().shape({
     username: Yup.string().required('Usuario Requerido'),
@@ -20,31 +22,29 @@ const schema = Yup.object().shape({
 
 })
 
-// const user: User = reactive<User>({
-   // username: '',
- //   password: '',
-  //  rememberMe: false
-// })
+
 
 
 function handleSubmit() {
    // uStore.setUser(user)
-    router.push('home')
+    auth.login(username, password).then( ()=> {
+      router.push('/Home')
+    }) 
 }
 
 
 </script>
 
 <template>
-        <Form @submit.prevent="handleSubmit" :validation-schema="schema" v-slot="{errors, isSubmitting}">
+        <Form @submit="handleSubmit" :validation-schema="schema" v-slot="{errors, isSubmitting}">
             <h1>Login</h1>
             <div class="input-bx">
-                <Field name="username" type="text" :class="{'is-invalid':errors.username || errorMessages.apiError }" placeholder="Usuario" required />
+                <Field name="username" type="text" :class="{'is-invalid':errors.username || errors.apiError }" placeholder="Usuario" required />
                 <ion-icon class="icon" name="person-circle"></ion-icon>
                 <div class="invalid-feedback">{{ errors.username }}</div>
             </div>
             <div class="input-bx">
-                <Field name="password" type="password" :class="{'is-invalid':errors.password || errorMessages.apiError }" placeholder="Contraseña" required />
+                <Field name="password" type="password" :class="{'is-invalid':errors.password || errors.apiError }" placeholder="Contraseña" required />
                 <ion-icon class="icon" name="lock-closed"></ion-icon>
                 <div class="invalid-feedback">{{ errors.password }}</div>
             </div>
