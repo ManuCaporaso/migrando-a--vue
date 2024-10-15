@@ -1,75 +1,98 @@
 <script setup lang="ts">
-import type { User } from '@/models/UserModel';
-
-// importaciones locales
-import { useUserStore } from '@/store/userStore';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/store/authStore';
-
-//importaciones de librerias
-import {Form,Field} from 'vee-validate'
+import { useAuthStore } from '@/store/authStore'
+import { useRouter } from 'vue-router'
+import { Form, Field } from 'vee-validate'
 import * as Yup from 'yup'
 
-
-const uStore = useUserStore()
-console.log(uStore)
+// Get the router instance and the auth store instance
 const router = useRouter()
-const auth = useAuthStore()
+const authStore = useAuthStore()
 
+// Define the form validation schema
 const schema = Yup.object().shape({
-    username: Yup.string().required('Usuario Requerido'),
-    password: Yup.string().required('Password requerida')
-
+  username: Yup.string().required('Usuario Requerido'),
+  password: Yup.string().required('Password Requerida')
 })
 
-
-
-
-function handleSubmit() {
-   // uStore.setUser(user)
-    auth.login(username, password).then( ()=> {
-      router.push('/Home')
-    }) 
+// Define the form submission handler
+function handleSubmit(values: any, { setErrors }: any) {
+  const { username, password } = values
+  // Validate the form data using the schema
+  return authStore
+    .login(username, password)
+    .then(() => {
+      // Redirect to the dashboard page after successful login
+      router.push('/')
+    })
+    .catch((error) => setErrors({ apiError: error }))
 }
-
-
 </script>
 
 <template>
-        <Form @submit="handleSubmit" :validation-schema="schema" v-slot="{errors, isSubmitting}">
-            <h1>Login</h1>
-            <div class="input-bx">
-                <Field name="username" type="text" :class="{'is-invalid':errors.username || errors.apiError }" placeholder="Usuario" required />
-                <ion-icon class="icon" name="person-circle"></ion-icon>
-                <div class="invalid-feedback">{{ errors.username }}</div>
-            </div>
-            <div class="input-bx">
-                <Field name="password" type="password" :class="{'is-invalid':errors.password || errors.apiError }" placeholder="Contraseña" required />
-                <ion-icon class="icon" name="lock-closed"></ion-icon>
-                <div class="invalid-feedback">{{ errors.password }}</div>
-            </div>
-            <div class="remember-forgot">
-                <label><input type="checkbox" name="remember"> Recordarme</label>
-                <a href="#">Olvidaste tu contraseña</a>
-            </div>
-            <button type="submit" class="btn">
-              <span v-show="isSubmitting" class="loader"></span>
-              <p v-show="!isSubmitting">Ingresar</p>
-            </button>
-        </Form>
+  <div class="wrapper">
+    <Form @submit="handleSubmit" :validation-schema="schema" v-slot="{ errors, isSubmitting }">
+      <h1>Login</h1>
+      <div class="input-bx">
+        <Field
+          name="username"
+          type="text"
+          :class="{ 'is-invalid': errors.username || errors.apiError }"
+          placeholder="Usuario"
+          required
+        />
+        <ion-icon class="icon" name="person-circle"></ion-icon>
+        <div class="invalid-feedback">{{ errors.username }}</div>
+      </div>
+      <div class="input-bx">
+        <Field
+          name="password"
+          :class="{ 'is-invalid': errors.password || errors.apiError }"
+          type="password"
+          placeholder="Contraseña"
+          required
+        />
+        <ion-icon class="icon" name="lock-closed"></ion-icon>
+        <div class="invalid-feedback">{{ errors.password }}</div>
+      </div>
+      <div class="remember-forgot">
+        <label><input type="checkbox" name="remember" /> Recordarme</label>
+        <a href="#">Olvidaste tu contraseña</a>
+      </div>
+      <button type="submit" class="btn">
+        <span v-show="isSubmitting" class="loader"></span>
+        <p v-show="!isSubmitting">Ingresar</p>
+      </button>
+      <div v-if="errors.apiError" class="error-alert">{{ errors.apiError }}</div>
+    </Form>
+  </div>
 </template>
 
 <style scoped>
-/* estilos del componente */
 
-.input-bx {
+.wrapper {
+  width: 400px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  color: #fff;
+  padding: 30px 40px;
+  border-radius: 15px;
+}
+
+.wrapper h1 {
+  font-size: 3em;
+  text-align: center;
+}
+
+.wrapper .input-bx {
   position: relative;
   width: 100%;
   height: 50px;
   margin: 30px 0;
 }
 
-.input-bx input {
+.wrapper .input-bx input {
   width: 100%;
   height: 100%;
   background: transparent;
@@ -81,24 +104,22 @@ function handleSubmit() {
   padding: 20px 45px 20px 20px;
 }
 
-.input-bx input.is-invalid{
-  width: 100%;
-  height: 100;
-  background-color: rgba(250, 150, 150, 0.1);
+.wrapper .input-bx input.is-invalid {
+  background: #333;
+  border: none;
   border: 2px solid rgba(255, 255, 255, 0.2);
-  color: red
+  color: red;
 }
 
-
-.input-bx input::placeholder {
+.wrapper .input-bx input::placeholder {
   color: #fff;
 }
 
-.input-bx input.is-invalid::placeholder {
+.wrapper .input-bx input.is-invalid::placeholder {
   color: #ff0000;
 }
 
-.input-bx .icon {
+.wrapper .input-bx .icon {
   position: absolute;
   right: 20px;
   top: 50%;
@@ -106,35 +127,32 @@ function handleSubmit() {
   font-size: 1.5em;
 }
 
-.input-bx .invalid-feedback{
-    padding: 0px 16px;
-    margin: 0;
-    color: #ff0000;
-    font-weight: 300;
+.wrapper .input-bx .invalid-feedback {
+  font-weight: 300;
 }
 
-.remember-forgot {
+.wrapper .remember-forgot {
   display: flex;
   justify-content: space-between;
   font-size: 1.2em;
-  margin: -15px 0 15px;
+  margin: 15px 0 15px;
 }
 
-.remember-forgot label input {
+.wrapper .remember-forgot label input {
   accent-color: #fff;
   margin-right: 3px;
 }
 
-.remember-forgot a {
+.wrapper .remember-forgot a {
   color: #fff;
   text-decoration: none;
 }
 
-.remember-forgot a:hover {
+.wrapper .remember-forgot a:hover {
   text-decoration: underline;
 }
 
-button {
+.wrapper button {
   width: 100%;
   height: 50px;
   border-radius: 15px;
@@ -145,25 +163,42 @@ button {
   font-size: 1.2em;
   font-weight: 600;
   color: #333;
+  transition: background-color 0.3s ease;
 }
 
-button p{
-  font-size:  1.2em;
+button p {
+  font-size: 1.2em;
   font-weight: 600;
   color: #333;
 }
-
-.louder{
-  margin:  auto 0;
+.btn:hover {
+  background-color: #4197b6;
+}
+.loader {
+  margin: auto 0;
   width: 24px;
   height: 24px;
-  border: 4px solid purple;
-  border-bottom-color: transparent ;
+  border: 4px solid #800080;
+  border-bottom-color: transparent;
   border-radius: 50%;
   display: inline-block;
   box-sizing: border-box;
   animation: rotation 1s linear infinite;
 }
-
-
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.error-alert {
+  margin: 16px 0 0 0;
+  width: 100%;
+  background: transparent;
+  color: red;
+  text-align: center;
+  font-weight: 400;
+}
 </style>

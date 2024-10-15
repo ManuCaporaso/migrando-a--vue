@@ -1,12 +1,16 @@
 export interface User {
   id: number
-  firstname: string
-  lastname: string
-  username: string
-  login: string
+  firstName: string
+  lastName: string
+  userName: string
   password: string
-  rememberMe: boolean
+  rememberMe?: boolean
   isAdmin: boolean
-  jwtToken: string
-  refreshTokens: string[]
+  jwtToken?: string
+  refreshToken: string[]
+}
+
+export interface UserState {
+  loading: boolean
+  users: User[] | null | undefined
 }
